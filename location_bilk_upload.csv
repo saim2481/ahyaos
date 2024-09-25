@@ -1,0 +1,3 @@
+name	address	apt_or_suite	country_name	city_name	state_name	zipcode	description
+factory	factory address	None	Pakistan	Karachi	Sindh	75100	factory used in manufactoring
+transportation port	port address	None	Pakistan	Karachi	Sindh	75200	port used to transport

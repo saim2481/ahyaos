@@ -1,0 +1,385 @@
+// General_Countries table
+Table General_Countries {
+  id bigint [primary key] // Unique identifier for the country
+  name varchar(255) [not null] // Name of the country
+  iso3 varchar(3) [null] // ISO3 code of the country
+  numeric_code varchar(3) [null] // Numeric code of the country
+  iso2 varchar(2) [null] // ISO2 code of the country
+  phonecode varchar(255) [null] // Phone code of the country
+  capital varchar(255) [null] // Capital of the country
+  currency varchar(255) [null] // Currency of the country
+  currency_name varchar(255) [null] // Name of the currency
+  currency_symbol varchar(255) [null] // Symbol of the currency
+  tld varchar(255) [null] // Top-level domain of the country
+  native varchar(255) [null] // Native name of the country
+  region varchar(255) [null] // Region of the country
+  subregion varchar(255) [null] // Subregion of the country
+  latitude double [null] // Latitude of the country
+  longitude double [null] // Longitude of the country
+  emoji varchar(191) [null] // Emoji representing the country
+  emojiU varchar(191) [null] // Unicode representation of the emoji
+  flag boolean [default: true] // Flag indicating if the country is active
+  wikiDataId varchar(255) [null] // WikiData ID of the country
+  createdAt timestamptz // Creation timestamp
+  createdBy uuid [null] // User who created the country
+  updatedAt timestamptz [null] // Last update timestamp
+  updatedBy uuid [null] // User who last updated the country
+  deletedAt timestamptz [null] // Deletion timestamp
+  deletedBy uuid [null] // User who deleted the country
+}
+
+Ref: General_Countries.createdBy > Users.id // many-to-one
+Ref: General_Countries.updatedBy > Users.id // many-to-one
+Ref: General_Countries.deletedBy > Users.id // many-to-one
+
+// General_States table
+Table General_States {
+  id bigint [primary key] // Unique identifier for the state
+  name varchar(255) [not null] // Name of the state
+  country_id bigint [not null] // References General_Countries table
+  country_code varchar(255) [null] // Country code
+  fips_code varchar(255) [null] // FIPS code
+  iso2 varchar(255) [null] // ISO2 code
+  type varchar(255) [null] // Type of the state
+  latitude double [null] // Latitude of the state
+  longitude double [null] // Longitude of the state
+  createdAt timestamptz // Creation timestamp
+  createdBy uuid [null] // User who created the state
+  updatedAt timestamptz [null] // Last update timestamp
+  updatedBy uuid [null] // User who last updated the state
+  deletedAt timestamptz [null] // Deletion timestamp
+  deletedBy uuid [null] // User who deleted the state
+}
+
+Ref: General_States.country_id > General_Countries.id // many-to-one
+Ref: General_States.createdBy > Users.id // many-to-one
+Ref: General_States.updatedBy > Users.id // many-to-one
+Ref: General_States.deletedBy > Users.id // many-to-one
+
+// General_Cities table
+Table General_Cities {
+  id bigint [primary key] // Unique identifier for the city
+  name varchar(255) [not null] // Name of the city
+  state_id bigint [not null] // References General_States table
+  state_code varchar(255) [null] // State code
+  country_id bigint [not null] // References General_Countries table
+  country_code varchar(255) [null] // Country code
+  latitude double [null] // Latitude of the city
+  longitude double [null] // Longitude of the city
+  createdAt timestamptz // Creation timestamp
+  createdBy uuid [null] // User who created the city
+  updatedAt timestamptz [null] // Last update timestamp
+  updatedBy uuid [null] // User who last updated the city
+  deletedAt timestamptz [null] // Deletion timestamp
+  deletedBy uuid [null] // User who deleted the city
+}
+
+Ref: General_Cities.state_id > General_States.id // many-to-one
+Ref: General_Cities.country_id > General_Countries.id // many-to-one
+Ref: General_Cities.createdBy > Users.id // many-to-one
+Ref: General_Cities.updatedBy > Users.id // many-to-one
+Ref: General_Cities.deletedBy > Users.id // many-to-one
+
+// Users table
+Table Users {
+  id uuid [primary key] // Unique identifier for the user
+  firstName varchar(50) // User's first name
+  lastName varchar(50) // User's last name
+  companyName varchar(50) // User's company name
+  companyEmail varchar(50) // User's company email
+  country_id bigint // References General_Countries table
+  state_id bigint // References General_States table
+  city_id bigint // References General_Cities table
+  password varchar(50) [not null] // User's password
+  userTypeId uuid [not null] // References User_Role table
+  isReset boolean [default: false] // Indicates if the user has reset their password
+  ipAddress varchar(50) // User's IP address
+  thirdPartySubscriptionId varchar(50) // User's third-party subscription ID
+  status integer [default: 4] // User's status
+  createdAt timestamptz // User's creation timestamp
+  createdBy uuid // References Users table
+  updatedAt timestamptz // User's update timestamp
+  updatedBy uuid // References Users table
+  deletedAt timestamptz // User's deletion timestamp
+  deletedBy uuid // References Users table
+  signupverifiedby uuid // User who verified the signup
+  profileverifiedby uuid // User who verified the profile
+  remarks varchar(500) // Remarks about the user
+}
+
+Ref: Users.country_id > General_Countries.id // many-to-one
+Ref: Users.state_id > General_States.id // many-to-one
+Ref: Users.city_id > General_Cities.id // many-to-one
+Ref: Users.userTypeId > User_Role.id // many-to-one
+Ref: Users.createdBy > Users.id // many-to-one
+Ref: Users.updatedBy > Users.id // many-to-one
+Ref: Users.deletedBy > Users.id // many-to-one
+Ref: Users.signupverifiedby > Users.id // many-to-one
+Ref: Users.profileverifiedby > Users.id // many-to-one
+
+// User_History table
+Table User_History {
+  id uuid [primary key] // Unique identifier for the history record
+  Type varchar(50) // Type of the history record
+  statusName varchar(50) // Status name of the history record
+  status integer [default: 1] // Status of the history record
+  remarks varchar(500) // Remarks about the history record
+  createdAt timestamptz // Creation timestamp of the history record
+  createdBy uuid // References Users table
+  updatedAt timestamptz // Update timestamp of the history record
+  updatedBy uuid // References Users table
+  deletedAt timestamptz // Deletion timestamp of the history record
+  deletedBy uuid // References Users table
+}
+
+Ref: User_History.createdBy > Users.id // many-to-one
+Ref: User_History.updatedBy > Users.id // many-to-one
+Ref: User_History.deletedBy > Users.id // many-to-one
+
+// User_Role table
+Table User_Role {
+  id uuid [primary key] // Unique identifier for the user role
+  typeName varchar(50) // Name of the user role
+  description varchar(255) // Description of the user role
+}
+
+// User_Info table
+Table User_Info {
+  userId uuid [not null] // References Users table
+  settingId uuid [not null] // References User_Settings table
+  primary key(userId, settingId)
+}
+
+Ref: User_Info.userId > Users.id // many-to-one
+Ref: User_Info.settingId > User_Settings.id // many-to-one
+
+// User_Codes table
+Table User_Codes {
+  id uuid [primary key] // Unique identifier for the user code
+  userId uuid [not null] // References Users table
+  code varchar(50) // User's code
+  identityName varchar(50) // Name of the identity
+  type varchar(50) // Type of the user code
+  status integer [default: 1] // Status of the user code
+  createdAt timestamptz // Creation timestamp of the user code
+  createdBy uuid // References Users table
+  updatedAt timestamptz // Update timestamp of the user code
+  updatedBy uuid // References Users table
+  deletedAt timestamptz // Deletion timestamp of the user code
+  deletedBy uuid // References Users table
+}
+
+Ref: User_Codes.userId > Users.id // many-to-one
+Ref: User_Codes.createdBy > Users.id // many-to-one
+Ref: User_Codes.updatedBy > Users.id // many-to-one
+Ref: User_Codes.deletedBy > Users.id // many-to-one
+
+// User_Settings table
+Table User_Settings {
+  id uuid [primary key] // Unique identifier for the user setting
+  userId uuid [not null] // References Users table
+  settingName varchar(50) // Name of the setting
+  settingValue varchar(50) // Value of the setting
+  status integer [default: 1] // Status of the setting
+  createdAt timestamptz // Creation timestamp of the setting
+  createdBy uuid // References Users table
+  updatedAt timestamptz // Update timestamp of the setting
+  updatedBy uuid // References Users table
+  deletedAt timestamptz // Deletion timestamp of the setting
+  deletedBy uuid // References Users table
+}
+
+Ref: User_Settings.userId > Users.id // many-to-one
+Ref: User_Settings.createdBy > Users.id // many-to-one
+Ref: User_Settings.updatedBy > Users.id // many-to-one
+Ref: User_Settings.deletedBy > Users.id // many-to-one
+
+// System_Sessions table
+Table System_Sessions {
+  id uuid [primary key] // Unique identifier for the system session
+  userId uuid [not null] // References Users table
+  token varchar(50) // Token of the session
+  status integer [default: 1] // Status of the session
+  createdAt timestamptz // Creation timestamp of the session
+  createdBy uuid // References Users table
+  updatedAt timestamptz // Update timestamp of the session
+  updatedBy uuid // References Users table
+  deletedAt timestamptz // Deletion timestamp of the session
+  deletedBy uuid // References Users table
+}
+
+Ref: System_Sessions.userId > Users.id // many-to-one
+Ref: System_Sessions.createdBy > Users.id // many-to-one
+Ref: System_Sessions.updatedBy > Users.id // many-to-one
+Ref: System_Sessions.deletedBy > Users.id // many-to-one
+
+// User_Role_Permissions table
+Table User_Role_Permissions {
+  id uuid [primary key] // Unique identifier for the user role permission
+  permissionName varchar(50) // Name of the permission
+  description varchar(255) // Description of the permission
+  createdAt timestamptz // Creation timestamp of the permission
+  createdBy uuid // References Users table
+  updatedAt timestamptz // Update timestamp of the permission
+  updatedBy uuid // References Users table
+  deletedAt timestamptz // Deletion timestamp of the permission
+  deletedBy uuid // References Users table
+}
+
+Ref: User_Role_Permissions.createdBy > Users.id // many-to-one
+Ref: User_Role_Permissions.updatedBy > Users.id // many-to-one
+Ref: User_Role_Permissions.deletedBy > Users.id // many-to-one
+
+// User_Role_Permissions_Mapping table
+Table User_Role_Permissions_Mapping {
+  roleId uuid [not null] // References User_Role table
+  permissionId uuid [not null] // References User_Role_Permissions table
+  primary key(roleId, permissionId)
+}
+
+Ref: User_Role_Permissions_Mapping.roleId > User_Role.id // many-to-one
+Ref: User_Role_Permissions_Mapping.permissionId > User_Role_Permissions.id // many-to-one
+
+// User_Business_Details table
+Table User_Business_Details {
+  id uuid [primary key] // Unique identifier for the business details
+  userId uuid [not null] // References Users table
+  companyName varchar(255) // Name of the company
+  industry varchar(255) // Industry of the company
+  companySize varchar(255) // Size of the company
+  revenue varchar(255) // Revenue of the company
+  country_id bigint // References General_Countries table
+  state_id bigint // References General_States table
+  city_id bigint // References General_Cities table
+  addressLine1 varchar(255) // Address line 1 of the business
+  addressLine2 varchar(255) // Address line 2 of the business
+  postalCode varchar(50) // Postal code of the business
+  website varchar(255) // Website of the business
+  contactPerson varchar(255) // Contact person of the business
+  contactEmail varchar(255) // Contact email of the business
+  contactPhone varchar(255) // Contact phone of the business
+  createdAt timestamptz // Creation timestamp of the business details
+  createdBy uuid // References Users table
+  updatedAt timestamptz // Update timestamp of the business details
+  updatedBy uuid // References Users table
+}
+
+Ref: User_Business_Details.userId > Users.id // many-to-one
+Ref: User_Business_Details.country_id > General_Countries.id // many-to-one
+Ref: User_Business_Details.state_id > General_States.id // many-to-one
+Ref: User_Business_Details.city_id > General_Cities.id // many-to-one
+Ref: User_Business_Details.createdBy > Users.id // many-to-one
+Ref: User_Business_Details.updatedBy > Users.id // many-to-one
+
+// User_Personal_Information table
+Table User_Personal_Information {
+  userId uuid [not null] // References Users table
+  firstName varchar(100) // First name of the user
+  lastName varchar(100) // Last name of the user
+  middleName varchar(100) // Middle name of the user
+  dateOfBirth timestamptz // Date of birth of the user
+  contactNumber varchar(50) // Contact number of the user
+  email varchar(255) // Email of the user
+  gender varchar(50) // Gender of the user
+  maritalStatus varchar(50) // Marital status of the user
+  residentialAddressLine1 varchar(255) // Residential address line 1
+  residentialAddressLine2 varchar(255) // Residential address line 2
+  country_id bigint // References General_Countries table
+  postalCode varchar(50) // Postal code of the residential address
+  state_id bigint // References General_States table
+  city_id bigint // References General_Cities table
+  createdAt timestamptz // Creation timestamp of the personal information
+  createdBy uuid // References Users table
+  updatedAt timestamptz // Update timestamp of the personal information
+  updatedBy uuid // References Users table
+}
+
+Ref: User_Personal_Information.userId > Users.id // many-to-one
+Ref: User_Personal_Information.country_id > General_Countries.id // many-to-one
+Ref: User_Personal_Information.state_id > General_States.id // many-to-one
+Ref: User_Personal_Information.city_id > General_Cities.id // many-to-one
+Ref: User_Personal_Information.createdBy > Users.id // many-to-one
+Ref: User_Personal_Information.updatedBy > Users.id // many-to-one
+
+// User_Company_Registration_Tax table
+Table User_Company_Registration_Tax {
+  id uuid [primary key] // Unique identifier for the company registration tax
+  userId uuid [not null] // References Users table
+  companyRegistrationNo varchar(100) // Company registration number
+  taxRegistrationNo varchar(100) // Tax registration number
+  createdAt timestamptz // Creation timestamp of the company registration tax
+  createdBy uuid // References Users table
+  updatedAt timestamptz // Update timestamp of the company registration tax
+  updatedBy uuid // References Users table
+  deletedAt timestamptz // Deletion timestamp of the company registration tax
+  deletedBy uuid // References Users table
+}
+
+Ref: User_Company_Registration_Tax.userId > Users.id // many-to-one
+Ref: User_Company_Registration_Tax.createdBy > Users.id // many-to-one
+Ref: User_Company_Registration_Tax.updatedBy > Users.id // many-to-one
+Ref: User_Company_Registration_Tax.deletedBy > Users.id // many-to-one
+
+// User_Bank_Account_Information table
+Table User_Bank_Account_Information {
+  id uuid [primary key] // Unique identifier for the bank account information
+  userId uuid [not null] // References Users table
+  bankName varchar(100) // Name of the bank
+  accountHolderName varchar(100) // Account holder name
+  accountNumber varchar(100) // Account number
+  branchName varchar(100) // Branch name
+  swiftCode varchar(100) // SWIFT code
+  iban varchar(100) // IBAN number
+  country_id bigint // References General_Countries table
+  state_id bigint // References General_States table
+  city_id bigint // References General_Cities table
+  createdAt timestamptz // Creation timestamp of the bank account information
+  createdBy uuid // References Users table
+  updatedAt timestamptz // Update timestamp of the bank account information
+  updatedBy uuid // References Users table
+}
+
+Ref: User_Bank_Account_Information.userId > Users.id // many-to-one
+Ref: User_Bank_Account_Information.country_id > General_Countries.id // many-to-one
+Ref: User_Bank_Account_Information.state_id > General_States.id // many-to-one
+Ref: User_Bank_Account_Information.city_id > General_Cities.id // many-to-one
+Ref: User_Bank_Account_Information.createdBy > Users.id // many-to-one
+Ref: User_Bank_Account_Information.updatedBy > Users.id // many-to-one
+
+// User_Goals_Targets table
+Table User_Goals_Targets {
+  id uuid [primary key] // Unique identifier for the goals and targets
+  userId uuid [not null] // References Users table
+  goal varchar(255) // Description of the goal
+  target varchar(255) // Description of the target
+  status integer [default: 1] // Status of the goal or target
+  createdAt timestamptz // Creation timestamp of the goal or target
+  createdBy uuid // References Users table
+  updatedAt timestamptz // Update timestamp of the goal or target
+  updatedBy uuid // References Users table
+  deletedAt timestamptz // Deletion timestamp of the goal or target
+  deletedBy uuid // References Users table
+}
+
+Ref: User_Goals_Targets.userId > Users.id // many-to-one
+Ref: User_Goals_Targets.createdBy > Users.id // many-to-one
+Ref: User_Goals_Targets.updatedBy > Users.id // many-to-one
+Ref: User_Goals_Targets.deletedBy > Users.id // many-to-one
+
+// User_Package_Subscription table
+Table User_Package_Subscription {
+  id uuid [primary key] // Unique identifier for package subscription
+  userId uuid [not null] // References Users table
+  packageName varchar(255) [null] // Name of the package
+  subscriptionDate timestamptz [null] // Subscription date
+  expiryDate timestamptz [null] // Expiry date
+  status integer [default: 1] // 1 = Active, 2 = Inactive, 3 = Expired, 4 = Cancelled
+  createdAt timestamptz // Creation timestamp
+  createdBy uuid [null] // User who created the subscription
+  updatedAt timestamptz [null] // Last update timestamp
+  updatedBy uuid [null] // User who last updated the subscription
+  deletedAt timestamptz [null] // Deletion timestamp
+  deletedBy uuid [null] // User who deleted the subscription
+}
+
+Ref: User_Package_Subscription.userId > Users.id // many-to-one
